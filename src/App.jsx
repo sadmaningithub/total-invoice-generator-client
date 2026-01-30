@@ -1,12 +1,13 @@
+import InvoiceForm from "./components/InvoiceForm"
 
 
 function App() {
 
 
   return (
-    <div>
-      <button className="btn">Default</button>
-    </div>
+    <>
+      <InvoiceForm/>
+    </>
   )
 }
 
