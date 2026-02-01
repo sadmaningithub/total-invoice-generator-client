@@ -1,11 +1,43 @@
+import html2canvas from "html2canvas-pro";
+import jsPDF from "jspdf";
+import { useRef } from "react";
 
 
 const Invoice = () => {
 
+    const printRef = useRef(null)
+
+    const handleDownloadPdf = async () =>{
+
+        const element = printRef.current;
+        console.log(element);
+        if(!element){
+            return;
+        }
+
+        const canvas = await html2canvas(element, {
+            scale: 3
+        });
+        const data = canvas.toDataURL("image/png");
+        // console.log(data);
+
+        const pdf = new jsPDF({
+            orientation: "portrait",
+            unit: "px",
+            format: "a4"
+        });
+        const imageProperties = pdf.getImageProperties(data);
+        // console.log(imageProperties);
+        const pdfWidth = pdf.internal.pageSize.getWidth();
+        const pdfHeight = (imageProperties.height * pdfWidth) / imageProperties.width;
+        // console.log(pdfWidth, pdfHeight);
+        pdf.addImage(data, "PNG", 0, 0, pdfWidth, pdfHeight);
+        pdf.save("invoice.pdf")
+    }   
 
     return (
-        <div className="min-h-screen bg-base-100 p-8">
-            <div className=" md:max-w-1/2 mx-auto bg-white p-5 mb-5 shadow-xs rounded-xl border border-gray-100">
+        <div className="min-h-screen bg-base-200 p-8">
+            <div ref={printRef} className=" md:max-w-2xl mx-auto bg-white p-5 mb-5 shadow-sm rounded-xl border border-gray-100">
 
                 <div className="flex flex-row justify-between items-center mb-5 p-5 border-b border-gray-100">
                     <div>
@@ -48,7 +80,7 @@ const Invoice = () => {
                     </thead>
                     <tbody className="divide-y divide-gray-100 border-t border-gray-100 ">
                         <tr>
-                            <td className="px-6 py-4">Hosting</td>
+                            <td className="px-6 py-4 ">Hosting</td>
                             <td className="px-6 py-4">1</td>
                             <td className="px-6 py-4">200</td>
                             <td className="px-6 py-4">200</td>
@@ -81,8 +113,8 @@ const Invoice = () => {
 
             </div>
 
-            <div className="border text-center">
-                <button className="btn">Download</button>
+            <div className="text-center">
+                <button onClick={handleDownloadPdf} className="btn bg-black text-white">Download</button>
             </div>
         </div>
     );
